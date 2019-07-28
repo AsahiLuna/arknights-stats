@@ -1,0 +1,22 @@
+<div class="row member-container">
+  <div class="col-12">
+    <div class="row">
+      <div style="font-size: 1.5rem; font-weight: 400;">站长</div>
+    </div>
+    <div class="row">
+      <div class="user-profiles-list-basic">
+        <app-member-card [profile]="owner"></app-member-card>
+      </div>
+    </div>
+    <div class="row">
+      <div style="font-size: 1.5rem; font-weight: 400; margin-top: 20px;">贡献者</div>
+    </div>
+    <div class="row">
+      <div class="user-profiles-list-basic d-flex flwx-row flex-wrap">
+        <div *ngFor="let profile of profiles">
+          <app-member-card [profile]="profile"></app-member-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

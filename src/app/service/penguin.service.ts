@@ -3,8 +3,6 @@ import { Injectable, isDevMode } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
-import { Stage } from '../interface/Stage';
-import { Item } from '../interface/Item';
 
 @Injectable({
     providedIn: 'root'
@@ -14,13 +12,14 @@ export class PenguinService {
     public origin: string;
 
     public api: any = {
-        chapter: "/PenguinStats/api/zone",
-        stage: "/PenguinStats/api/stage",
-        item: "/PenguinStats/api/item",
+        chapter: "/PenguinStats/api/zones",
+        stage: "/PenguinStats/api/stages",
+        item: "/PenguinStats/api/items",
         stageResult: "/PenguinStats/api/result/stage/",
         itemResult: "/PenguinStats/api/result/item/",
         report: "/PenguinStats/api/report",
-        limitation: "/PenguinStats/api/limitation"
+        limitation: "/PenguinStats/api/limitations",
+        user: "/PenguinStats/api/users"
     };
 
     private chapterListDataSource = new BehaviorSubject<any>(null);
@@ -55,7 +54,7 @@ export class PenguinService {
 
     isPersonal = false;
 
-    version = "v1.2.1";
+    version = "v1.4.5";
 
     constructor(private http: HttpClient) {
         this.isTest = isDevMode();
@@ -79,9 +78,9 @@ export class PenguinService {
     getAllChapters(snackBar: MatSnackBar = null): Observable<any> {
         return this.http.get(this.origin + this.api.chapter).pipe(map((res) => {
             if (res) {
-                this.chapterListDataSource.next(this._sortChapterList(res['zones']));
+                this.chapterListDataSource.next(this._sortChapterList(res));
             }
-            return res['zones'];
+            return res;
         })).pipe(catchError(
             (err, caught) => {
                 if (!snackBar) {
@@ -97,7 +96,7 @@ export class PenguinService {
     getAllStages(snackBar: MatSnackBar = null): Observable<any> {
         return this.http.get(this.origin + this.api.stage).pipe(map((res) => {
             if (res) {
-                this.stageMapDataSource.next(this._convertListToMap(res['stages'], 'stageId'));
+                this.stageMapDataSource.next(this._convertListToMap(res, 'stageId'));
             }
             return res;
         })).pipe(catchError(
@@ -115,10 +114,10 @@ export class PenguinService {
     getAllItems(snackBar: MatSnackBar = null): Observable<any> {
         return this.http.get(this.origin + this.api.item).pipe(map((res) => {
             if (res) {
-                this.itemListDataSource.next(this._sortItemList(res['items']));
-                this.itemMapDataSource.next(this._convertListToMap(res['items'], 'itemId'));
+                this.itemListDataSource.next(this._sortItemList(res));
+                this.itemMapDataSource.next(this._convertListToMap(res, 'itemId'));
             }
-            return res['items'];
+            return res;
         })).pipe(catchError(
             (err, caught) => {
                 if (!snackBar) {
@@ -134,9 +133,9 @@ export class PenguinService {
     getLimitations(snackBar: MatSnackBar = null): Observable<any> {
         return this.http.get(this.origin + this.api.limitation).pipe(map((res) => {
             if (res) {
-                this.limitationMapDataSource.next(this._convertListToMap(res['limitations'], 'name'));
+                this.limitationMapDataSource.next(this._convertListToMap(res, 'name'));
             }
-            return res['limitations'];
+            return res;
         })).pipe(catchError(
             (err, caught) => {
                 if (!snackBar) {
@@ -152,10 +151,14 @@ export class PenguinService {
     getItemResult(id: string, snackBar: MatSnackBar = null): Observable<any> {
         let observable: Observable<any>;
         if (this.isPersonal) {
-            observable = this.http.post(this.origin + this.api.itemResult + id, {
-                stageTimes: JSON.parse(localStorage.getItem("stageTimes")),
-                dropMatrix: JSON.parse(localStorage.getItem("dropMatrix"))
-            });
+            let payload: any = {};
+            const stageTimesStr = localStorage.getItem("stageTimes");
+            const dropMatrixStr = localStorage.getItem("dropMatrix");
+            if (stageTimesStr && dropMatrixStr) {
+                payload.stageTimes = JSON.parse(stageTimesStr);
+                payload.dropMatrix = JSON.parse(dropMatrixStr);
+            }
+            observable = this.http.post(this.origin + this.api.itemResult + id, payload);
         } else {
             observable = this.http.get(this.origin + this.api.itemResult + id);
         }
@@ -180,10 +183,14 @@ export class PenguinService {
     getStageResult(id: string, snackBar: MatSnackBar = null): Observable<any> {
         let observable: Observable<any>;
         if (this.isPersonal) {
-            observable = this.http.post(this.origin + this.api.stageResult + id, {
-                stageTimes: JSON.parse(localStorage.getItem("stageTimes")),
-                dropMatrix: JSON.parse(localStorage.getItem("dropMatrix"))
-            });
+            let payload: any = {};
+            const stageTimesStr = localStorage.getItem("stageTimes");
+            const dropMatrixStr = localStorage.getItem("dropMatrix");
+            if (stageTimesStr && dropMatrixStr) {
+                payload.stageTimes = JSON.parse(stageTimesStr);
+                payload.dropMatrix = JSON.parse(dropMatrixStr);
+            }
+            observable = this.http.post(this.origin + this.api.stageResult + id, payload);
         } else {
             observable = this.http.get(this.origin + this.api.stageResult + id);
         }
@@ -205,7 +212,7 @@ export class PenguinService {
         ));
     }
 
-    private _convertListToMap(list: any[], key: string): any {
+    private _convertListToMap(list: any, key: string): any {
         let result: any = {};
         list.forEach(item => {
             result[item[key]] = item;

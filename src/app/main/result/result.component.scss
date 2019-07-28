@@ -12,14 +12,6 @@
   font-size: 1.2rem;
 }
 
-.material-img-container {
-  background-repeat: no-repeat;
-  background-size: contain;
-  width: 100%;
-  height: 0;
-  padding-top: 100%;
-}
-
 .material-container {
   min-width: 45px;
   max-width: 60px;
@@ -58,6 +50,10 @@
   padding-bottom: 0.4rem;
 }
 
+.result-table-container {
+  margin-top: 1rem;
+}
+
 table {
   width: 100%;
 }
@@ -69,35 +65,44 @@ table {
 }
 
 @media screen and (max-width: 500px) {
-  .table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
+  .result-table-container {
+    overflow-x: scroll;
+    margin-left: -10%;
+    margin-right: -10%;
 
-    .mat-table {
-      width: 100%;
-      max-width: 100%;
-      margin-bottom: 1rem;
-      display: table;
-      border-collapse: collapse;
-      margin: 0px;
-    }
+    .table-responsive {
+      // display: block;
+      // width: 100%;
+      // overflow-x: auto;
+      // margin-left: -7%;
+      // min-width: 98vw;
+      padding-left: 0px !important;
 
-    .mat-row,
-    .mat-header-row {
-      display: table-row;
-    }
+      .mat-table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        display: table;
+        border-collapse: collapse;
+        margin: 0px;
+      }
 
-    .mat-cell,
-    .mat-header-cell {
-      word-wrap: initial;
-      display: table-cell;
-      padding: 0px 5px;
-      line-break: unset;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      vertical-align: middle;
+      .mat-row,
+      .mat-header-row {
+        display: table-row;
+      }
+
+      .mat-cell,
+      .mat-header-cell {
+        word-wrap: initial;
+        display: table-cell;
+        padding: 0px 5px;
+        line-break: unset;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        vertical-align: middle;
+      }
     }
   }
 }
